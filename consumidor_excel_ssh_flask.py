@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Datos de conexión SSH
 hostname = 'ssh-natureza.alwaysdata.net'
 username = 'natureza_anon'
-password = '123456'
+password = '(123456)'
 
 # Ruta del archivo Excel en el servidor remoto
 remote_path = '/path/to/datos_estadisticos.xlsx'
