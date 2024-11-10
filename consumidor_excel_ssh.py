@@ -1,5 +1,8 @@
+from flask import Flask
 import paramiko
 import os
+
+app = Flask(__name__)
 
 # Configuración del servidor SSH
 hostname = 'ssh-natureza.alwaysdata.net'
@@ -34,6 +37,12 @@ def download_file_via_ssh():
         
     except Exception as e:
         print(f"Error al descargar el archivo: {e}")
+        return str(e)
+
+@app.route('/download', methods=['GET'])
+def download():
+    download_file_via_ssh()
+    return "Archivo descargado correctamente."
 
 if __name__ == '__main__':
-    download_file_via_ssh()
+    app.run(debug=True)
