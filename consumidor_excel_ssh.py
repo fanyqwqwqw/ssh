@@ -1,33 +1,39 @@
 import paramiko
+import os
 
-# Configuración de la conexión SSH
+# Configuración del servidor SSH
 hostname = 'ssh-natureza.alwaysdata.net'
 port = 22
 username = 'natureza_anon'
-password = '(123456)'  # Asegúrate de no usar contraseñas en texto plano en producción
+password = '(123456)'
+remote_file_path = 'chavez_marin.xlsx'  # Ruta remota del archivo
+local_file_path = os.path.join(os.getcwd(), remote_file_path)  # Ruta local donde se guardará
 
-# Ruta remota donde está almacenado el archivo
-ruta_remota = 'chavez_marin.xlsx'  # Ruta del archivo en el servidor
-ruta_local = 'chavez_marin_descargado.xlsx'  # Ruta local donde se guardará el archivo
+def download_file_via_ssh():
+    try:
+        # Crear una instancia del cliente SSH
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        # Conectarse al servidor
+        print(f"Conectando a {hostname}...")
+        ssh.connect(hostname, port, username, password)
+        print("Conexión establecida.")
+        
+        # Crear una sesión SFTP
+        sftp = ssh.open_sftp()
+        print(f"Descargando el archivo {remote_file_path}...")
+        
+        # Descargar el archivo
+        sftp.get(remote_file_path, local_file_path)
+        print(f"Archivo descargado exitosamente en: {local_file_path}")
+        
+        # Cerrar la conexión SFTP y SSH
+        sftp.close()
+        ssh.close()
+        
+    except Exception as e:
+        print(f"Error al descargar el archivo: {e}")
 
-# Crear una instancia SSHClient
-ssh = paramiko.SSHClient()
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Aceptar claves desconocidas automáticamente
-
-try:
-    # Conectarse al servidor
-    ssh.connect(hostname, port=port, username=username, password=password)
-    print("Conexión exitosa")
-
-    # Usar SFTP para descargar el archivo
-    sftp = ssh.open_sftp()
-
-    # Descargar el archivo
-    sftp.get(ruta_remota, ruta_local)  # Descargar el archivo desde el servidor remoto a la máquina local
-    sftp.close()
-
-    print(f'Archivo descargado con éxito y guardado como {ruta_local}')
-except Exception as e:
-    print(f"Error durante la transferencia: {e}")
-finally:
-    ssh.close()
+if __name__ == '__main__':
+    download_file_via_ssh()
